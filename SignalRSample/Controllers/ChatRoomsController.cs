@@ -22,28 +22,7 @@ namespace SignalRSample.Controllers
         {
             _context = context;
         }
-
-        // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers()
-        {
-            var users = await _context.Users.ToListAsync();
-            return users;
-        }
-
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ApplicationUser>> GetUser(string id)
-        {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
-        }
+        
         // GET: api/ChatRooms
         [HttpGet]
         [Route("/[controller]/GetChatRoom")]
