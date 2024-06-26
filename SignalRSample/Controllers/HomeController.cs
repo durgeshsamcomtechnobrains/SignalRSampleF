@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using SignalRSample.Data;
 using SignalRSample.Hubs;
 using SignalRSample.Models;
@@ -16,22 +18,45 @@ namespace SignalRSample.Controllers
         private readonly IHubContext<DeathlyHallowsHub> _deathlyHub;
         private readonly IHubContext<OrderHub> _orderHub;
         private readonly ApplicationDbContext _context;
-        public HomeController(ILogger<HomeController> logger,
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IHubContext<UserActivityHub> _userActivityHub;
+        public HomeController(
+            ILogger<HomeController> logger,
             IHubContext<DeathlyHallowsHub> deathlyHub,
             IHubContext<OrderHub> orderHub,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager,
+            IHubContext<UserActivityHub> userActivityHub)
         {
             _logger = logger;
             _deathlyHub = deathlyHub;   
             _context = context;
+            _userManager = userManager;
+            _userActivityHub = userActivityHub;
             _orderHub = orderHub;
         }
 
         public IActionResult Index()
         {
             return View();
-        
+
         }
+
+        // Action to display active users
+        public async Task<IActionResult> ActiveUsers()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            return View(users);
+        }
+
+        // SignalR method to update active users
+        public async Task<IActionResult> UpdateActiveUsers()
+        {
+            var users = await _userManager.Users.Select(u => u.UserName).ToArrayAsync();
+            await _userActivityHub.Clients.All.SendAsync("ReceiveActiveUsers", users);
+            return Accepted();
+        }
+        
         [Authorize]
         public IActionResult Chat()
         {

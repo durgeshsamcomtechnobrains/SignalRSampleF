@@ -14,6 +14,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 //var connectionAzureSignalR = "Endpoint=https://dotnetmastery.service.signalr.net;AccessKey=m9Enl0s8dqQGU6l0M0SGDqjwMttKvqN84hX+acKepmU=;Version=1.0;";
 
@@ -21,6 +22,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 
 var app = builder.Build();
+
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+//        .AddEntityFrameworkStores<ApplicationDbContext>()
+//        .AddDefaultTokenProviders();
+
+//builder.Services.AddScoped<UserManager<IdentityUser>>();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -45,6 +53,13 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
+
 app.MapRazorPages();
 app.MapHub<UserHub>("/hubs/userCount");
 app.MapHub<DeathlyHallowsHub>("hubs/deathyhallows");
